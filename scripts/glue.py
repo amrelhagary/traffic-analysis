@@ -94,7 +94,7 @@ class TrafficAnalysis:
         # print(f"total: {total}")
         return total
 
-    def is_purchase_order(self, event_list: list[int], purchase_event: int):
+    def is_purchase_order(self, event_list: list, purchase_event: int):
         """ Filter purchase orders by status"""
         if not event_list:
             return False
