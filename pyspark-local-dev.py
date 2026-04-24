@@ -1,9 +1,6 @@
-import sys
-from awsglue.transforms import *
-from awsglue.utils import getResolvedOptions
-from pyspark.context import SparkContext
-from awsglue.context import GlueContext
-from awsglue.job import Job
+#!/usr/bin/env python
+# coding: utf-8
+
 from pyspark.sql import SparkSession
 from pyspark.sql.types import (
     StructType, StructField, IntegerType, BooleanType,
@@ -16,15 +13,8 @@ from datetime import datetime
 from enum import IntEnum
 import re
 
-## @params: [JOB_NAME]
-args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 
-sc = SparkContext()
-glueContext = GlueContext(sc)
-spark = glueContext.spark_session
-job = Job(glueContext)
-job.init(args['JOB_NAME'], args)
-
+from enum import IntEnum
 
 class Status(IntEnum):
     """User interaction and transaction status codes."""
@@ -125,7 +115,16 @@ class TrafficAnalysis:
 
 
 
+
+
 def main():
+
+    spark = SparkSession.builder \
+        .appName("traffic-analysis") \
+        .master("local[*]") \
+        .getOrCreate()
+
+
 
     # Read raw TSV — event_list and product_list ingested as StringType first
     raw_schema = StructType([
@@ -145,7 +144,7 @@ def main():
 
     df = (
         spark.read.csv(
-            "s3://acs-raw-dev-us-east-1-748560967446/data.sql",
+            "./data/data.sql",
             schema=raw_schema,
             sep="\t",
             header=True,
@@ -208,11 +207,9 @@ def main():
     output_filename = f"{today.strftime('%Y-%m-%d')}_SearchKeywordPerformance.tab"
 
 
-    output_df.coalesce(1).write.mode("overwrite").option("header", "true").option("sep", "\t").csv(f"s3://acs-raw-stage-us-east-1-748560967446/output/{output_filename}")
+    output_df.coalesce(1).write.mode("overwrite").option("header", "true").option("sep", "\t").csv(f"./output/{output_filename}")
 
 
 
 if __name__ == "__main__":
     main()
-
-job.commit()
