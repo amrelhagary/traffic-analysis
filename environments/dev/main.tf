@@ -12,5 +12,7 @@ module "glue_infra" {
   script_name      = "glue.py"
   alert_email      = var.alert_email
   s3_input_path    = var.s3_input_path
+  s3_input_bucket   = var.s3_input_bucket
   s3_output_path   = var.s3_output_path
+  s3_output_bucket   = var.s3_output_bucket
 }
