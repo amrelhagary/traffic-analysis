@@ -1,4 +1,6 @@
 .venv
 data/*.sql
-.ipynb_checkpoints/*
+.ipynb_checkpoints
 output/*
+.terraform
+.terraform.lock.hcl

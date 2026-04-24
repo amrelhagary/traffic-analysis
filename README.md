@@ -96,7 +96,7 @@ The output filename is dynamically generated based on the current date:
 `{YYYY-MM-DD}_SearchKeywordPerformance.tab`
 *Note: Running this job multiple times on the same calendar day will overwrite the previous output file.*
 
-## Deployment Instructions
+## Local Deployment Instructions
 
 ### 1. Create the Script
 Upload the `glue.py` code to the Glue Job script location in your AWS account or S3 bucket.
@@ -118,3 +118,45 @@ Click **Run Job** in the Glue console or trigger it via AWS Glue Triggers, Cloud
 aws glue start-job-run \
     --job-name "KeywordRevenueAnalysis" \
     --arguments '{"JOB_NAME": "KeywordRevenueAnalysis", "S3_INPUT_FILE_PATH": "s3://your-bucket/input/raw_traffic_logs.tsv", "S3_OUTPUT_FILE_PATH": "s3://your-bucket/output/processed/"}'
+```
+
+## Terraform Deployment Instructions
+
+### Pre-Deployment Checklist
+### Before running Terraform, you must create these AWS resources manually:
+
+#### Resource	Dev Account	Prod Account
+S3 State Bucket	my-dev-tf-state-bucket	my-prod-tf-state-bucket
+DynamoDB Lock Table	terraform-locks	terraform-locks
+AWS CLI Profile	dev_account	prod_account
+Create state bucket:
+
+```bash
+aws s3 mb s3://my-dev-tf-state-bucket --profile dev_account
+aws s3 mb s3://my-prod-tf-state-bucket --profile prod_account
+
+```
+
+Create DynamoDB table:
+```bash
+aws dynamodb create-table \
+  --table-name terraform-locks \
+  --attribute-definitions AttributeName=LockID,AttributeType=S \
+  --key-schema AttributeName=LockID,KeyType=HASH \
+  --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
+  --profile dev_account
+```
+### Deploy
+### Deploy Dev
+```bash
+cd environments/dev
+terraform init
+terraform apply
+```
+
+### Deploy Prod
+```bash
+cd ../prod
+terraform init
+terraform apply
+```
