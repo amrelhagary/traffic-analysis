@@ -160,3 +160,6 @@ cd ../prod
 terraform init
 terraform apply
 ```
+
+# Monitoring
+Using Cloudwatch Monitoring Dashboard and SNS Email Trigger for Error 
