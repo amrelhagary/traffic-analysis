@@ -27,3 +27,11 @@ variable "s3_output_path" {
 variable "alert_email" {
   type = string
 }
+
+variable "s3_input_bucket" {
+  type        = string
+}
+
+variable "s3_output_bucket" {
+  type        = string
+}

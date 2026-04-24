@@ -48,7 +48,8 @@ resource "aws_glue_job" "main" {
 # Upload Python Script to S3
 resource "aws_s3_object" "script" {
   bucket = aws_s3_bucket.code_bucket.bucket
-  key    = "${var.environment}/${var.script_name}"
+  # key    = "${var.environment}/${var.script_name}"
+  key    = "${var.script_name}"
   source = "../../scripts/glue.py"
   etag   = filemd5("../../scripts/glue.py")
 }
@@ -90,10 +91,10 @@ resource "aws_iam_role_policy" "glue_policy" {
         ]
         Effect   = "Allow"
         Resource = [
-          "arn:aws:s3:::${var.s3_input_path}",
-          "arn:aws:s3:::${var.s3_output_path}",
-          "arn:aws:s3:::${var.s3_input_path}/*",
-          "arn:aws:s3:::${var.s3_output_path}/*",
+          "arn:aws:s3:::${var.s3_input_bucket}",
+          "arn:aws:s3:::${var.s3_output_bucket}",
+          "arn:aws:s3:::${var.s3_input_bucket}/*",
+          "arn:aws:s3:::${var.s3_output_bucket}/*",
           "arn:aws:s3:::${aws_s3_bucket.code_bucket.bucket}/*"
         ]
       },
