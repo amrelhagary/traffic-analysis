@@ -17,13 +17,16 @@ from enum import IntEnum
 import re
 
 ## @params: [JOB_NAME]
-args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+args = getResolvedOptions(sys.argv, ['JOB_NAME', 'S3_INPUT_FILE_PATH', 'S3_OUTPUT_FILE_PATH'])
 
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
+
+input_file_path = args['S3_INPUT_FILE_PATH'] if args['S3_INPUT_FILE_PATH'] else None
+output_file_path = args['S3_OUTPUT_FILE_PATH'] if args['S3_OUTPUT_FILE_PATH'] else None
 
 
 class Status(IntEnum):
@@ -142,10 +145,10 @@ def main():
         StructField("product_list",   StringType(),    True),
         StructField("referrer",       StringType(),    True),
     ])
-
+    
     df = (
         spark.read.csv(
-            "s3://acs-raw-dev-us-east-1-748560967446/data.sql",
+            input_file_path,
             schema=raw_schema,
             sep="\t",
             header=True,
@@ -208,7 +211,7 @@ def main():
     output_filename = f"{today.strftime('%Y-%m-%d')}_SearchKeywordPerformance.tab"
 
 
-    output_df.coalesce(1).write.mode("overwrite").option("header", "true").option("sep", "\t").csv(f"s3://acs-raw-stage-us-east-1-748560967446/output/{output_filename}")
+    output_df.coalesce(1).write.mode("overwrite").option("header", "true").option("sep", "\t").csv(f"{output_file_path}/{output_filename}")
 
 
 
